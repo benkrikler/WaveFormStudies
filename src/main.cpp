@@ -6,8 +6,6 @@
 
 using namespace WFS;
 
-void Abort();
-
 int main(int argc, char*argv[]) {
 
 
@@ -32,10 +30,10 @@ int main(int argc, char*argv[]) {
     runMgr->RunEventLoop();
 
     }catch ( Errors::BaseError& e){
-        e.what();
+        std::cout<<e.what();
         if(RunManager::Instance())
             RunManager::Instance()->Abort();
-        return e.Exit(1);
+        return e.Exit(0);
     }
 
     return 0;

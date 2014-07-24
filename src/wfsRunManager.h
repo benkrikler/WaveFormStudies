@@ -1,16 +1,16 @@
 #include "wfsDefinitions.h"
 #include "ModulesOptions.h"
 
+class TFile;
+
 namespace WFS{
     class RunManager;
 }
 
 class WFS::RunManager{
 
-        RunManager():fCommandLine("RunManager"){}
+        RunManager();
         ~RunManager(){
-            if(fThis)delete fThis;
-            fThis=NULL;
         }
 
     public:
@@ -31,4 +31,5 @@ class WFS::RunManager{
     private:
         static RunManager* fThis;
         modules::options fCommandLine;
+        TFile* fOutFile;
 };

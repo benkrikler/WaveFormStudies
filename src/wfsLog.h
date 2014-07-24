@@ -10,7 +10,7 @@ namespace WFS{
 
 class WFS::Logger {
     public:
-    enum Level_t{ kQuiet=0, kTimid, kOutgoing, kShowoff};
+    enum Level_t{ kQuiet=1, kTimid=2, kOutgoing=3, kShowoff=4};
 
     static Logger* Instance(){
         if(!fThis) fThis=new Logger();

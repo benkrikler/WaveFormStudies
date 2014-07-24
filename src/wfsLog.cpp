@@ -4,10 +4,12 @@
 
 WFS::Logger* WFS::Logger::fThis=NULL;
 
-WFS::Logger::Logger(const Logger& rhs):fOut(NULL),fErr(NULL),fNull(NULL){
+WFS::Logger::Logger(const Logger& rhs):fOut(NULL),fErr(NULL),fNull(NULL),
+    fOutVerbosity(kTimid),fErrVerbosity(kTimid){
 }
 
-WFS::Logger::Logger():fOut(NULL),fErr(NULL),fNull(NULL){
+WFS::Logger::Logger():fOut(NULL),fErr(NULL),fNull(NULL),
+    fOutVerbosity(kTimid),fErrVerbosity(kTimid){
     fNull= new std::ofstream("/dev/null", std::ios::out|std::ios::app);
 }
 
