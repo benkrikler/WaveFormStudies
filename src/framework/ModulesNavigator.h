@@ -35,7 +35,7 @@ class modules::navigator{
   public:
       /// read in a modules file, constructing each module and adding it to the list
       /// returns 0 on success and non-zero on failure
-      int LoadConfigFile(const char* filename);
+      int LoadModulesFile(const std::string& filename);
 
       /// Make all modules that were requested through the modules file
       /// Requires that LoadConfigFile has already been called successfully

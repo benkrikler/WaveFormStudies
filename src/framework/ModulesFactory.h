@@ -5,7 +5,6 @@
 class BaseModule;
 
 namespace modules{
-    // In the future I plan to rename the BaseModule class, so this will help
    typedef BaseModule BaseModule;
     class factory;
     class options;
@@ -28,5 +27,8 @@ inline modules::factory* modules::factory::Instance(){
     }
     return instance;
 }
+
+#define REGISTER_MODULE( CLASS , ... ) \
+RegistryProxy<CLASS,modules::BaseModule,modules::options,modules::factory> p_##CLASS(#CLASS, #__VA_ARGS__);
 
 #endif // MODULESFACTORY__HH_

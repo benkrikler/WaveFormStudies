@@ -7,14 +7,14 @@ using std::endl;
 
 modules::navigator::navigator():fModulesLoaded(false),fModulesMade(false),fDebug(false),fOutFile(NULL){};
 
-int modules::navigator::LoadConfigFile(const char* filename){
+int modules::navigator::LoadModulesFile(const std::string& filename){
     // Check we haven't already opened a modules file
     if(fModulesLoaded ) {
 	    cout<<"Error: Loading a new modules file, when one was already loaded"<<endl;
 	    return 1;
     }
     // Read in the file and dump the processed options
-    int retVal=fModulesFile.ReadFile(filename);
+    int retVal=fModulesFile.ReadFile(filename.c_str());
     if(retVal!=0) return retVal;
 
     // Check the file contained at least one module
