@@ -1,4 +1,4 @@
-all:  init libAnalysis.so studyWaveforms libAnalysis.rootmap
+all:  init libAnalysis.so studyWaveforms 
 
 .PHONY: clean print all unit_test doxygen
 
@@ -24,7 +24,7 @@ ROOT_DICT_SOURCES:=$(foreach class, $(ROOT_DICT_CLASSES),$(filter %/$(class).cpp
 
 #### End of files.make processing #################################################
 # Where should we store all object and dependency files
-OBJ_DIR = obj
+OBJ_DIR = tmp
 
 # What should we call the root dictionary
 DATA_LIBRARY_NAME:=DataClasses
@@ -66,7 +66,7 @@ OPTFLAGS = -g -O3 -Wno-write-strings
 CXXFLAGS := $(OPTFLAGS) \
            $(INCLUDE_CFLAGS) $(ROOT_CFLAGS) -fPIC
 
-DATALINKDEF := src/LibraryLinkDef.h
+DATALINKDEF := LibraryLinkDef.h
 DATACLASSES :=lib$(DATA_LIBRARY_NAME).so 
 DATA_LIBRARY_SOURCE := ${OBJ_DIR}/$(DATA_LIBRARY_NAME).cpp
 DATA_LIBRARY_HEADER := ${OBJ_DIR}/$(DATA_LIBRARY_NAME).h
@@ -77,7 +77,7 @@ OBJECTS := $(notdir $(patsubst %.C,%.o,$(SOURCES)))
 OBJECTS := $(patsubst %.cpp,%.o, $(OBJECTS))
 OBJECTS := $(addprefix $(OBJ_DIR)/, $(OBJECTS))
 
-TUT_USE_OBJECTS := $(filter-out obj/main.o, $(OBJECTS))
+TUT_USE_OBJECTS := $(filter-out $(OBJ_DIR)/main.o, $(OBJECTS))
 TUT_OBJECTS := $(notdir $(patsubst %.cpp,%.o, $(TUT_SOURCES)))
 TUT_OBJECTS := $(addprefix $(TUT_ROOT)/, $(TUT_OBJECTS)) 
 
@@ -99,7 +99,7 @@ $(DATACLASSES):  $(DATA_LIBRARY_SOURCE) $(ROOT_DICT_SOURCES)
 
 studyWaveforms: $(OBJECTS) $(DATACLASSES)
 	@echo -e "Building executable" 
-	@$(CXX) $(ICCFLAGS) -Wl,--no-as-needed -o studyWaveforms $(OBJECTS) $(ROOT_LIBS) -L$(PWD) $(DATACLASSES)
+	@$(CXX) $(ICCFLAGS) -Wl,--no-as-needed -o studyWaveforms $(OBJECTS) $(ROOT_LIBS) -L$(PWD) $(PWD)/$(DATACLASSES)
 
 libAnalysis.so: $(OBJECTS) $(DATACLASSES)
 	@echo -e "Making shared library: '"$@"' from '"$^"'"
