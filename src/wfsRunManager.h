@@ -27,6 +27,8 @@ class WFS::RunManager{
             return fCommandLine.GetString("module_file","MODULES.txt");
         };
 
+        TFile* GetOutFile()const {return fOutFile;}
+
 
     private:
         static RunManager* fThis;

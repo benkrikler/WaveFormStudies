@@ -66,7 +66,11 @@ class WFS::Logger {
 #define WFSOut(level, ...) \
     WFS::Logger::Instance()->Output( (WFS::Logger::Level_t) level, #__VA_ARGS__  )
 
-#define WFSErr(level) \
-    WFS::Logger::Instance()->Error( (WFS::Logger::Level_t) level,__FILE__ ":" __LINE__ )
+#define WFSErr3(level,lineno) \
+    WFS::Logger::Instance()->Error( (WFS::Logger::Level_t) level, "Error: "__FILE__ "(" #lineno "): " )
+
+#define WFSErr2(level,lineno) WFSErr3(level,lineno) 
+
+#define WFSErr(level) WFSErr2(level,__LINE__)
 
 #endif //WFS_LOG_H

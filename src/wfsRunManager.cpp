@@ -1,6 +1,8 @@
 #include "wfsRunManager.h"
 #include "wfsLog.h"
 #include "wfsErrors.h"
+#include "ModulesNavigator.h"
+#include "BaseModule.h"
 
 #include <unistd.h>
 #include <TFile.h>
@@ -64,11 +66,31 @@ void RunManager::OpenOutputs(){
     }
     std::string filename=fCommandLine.GetString("output_file","output.root");
     fOutFile=new TFile(filename.c_str(),"recreate");
-    if(fOutFile) std::cout<<"Opened file"<<std::endl;
+    if(fOutFile){
+        WFSOut(2)<<"Opened file, '"<<filename<<"'"<<std::endl;
+        modules::navigator::Instance()->SetOutFile(fOutFile);
+    }
 }
 
 void RunManager::RunEventLoop(){
     WFSOut(3)<<"Main Event loop"<<std::endl;
+    const modules::iterator begin=modules::navigator::Instance()->Begin();
+    const modules::iterator end=modules::navigator::Instance()->End();
+
+    for( modules::iterator i_module=begin;i_module!=end;++ i_module ){
+        WFSOut(2, "RunManager")<<"BeforeFirstEntry on: "<<i_module->second->GetName();
+        i_module->second->BeforeFirstEntry();
+    }
+
+    for( modules::iterator i_module=begin;i_module!=end;++ i_module ){
+        WFSOut(2, "RunManager")<<"ProcessEntry on: "<<i_module->second->GetName();
+        i_module->second->ProcessGenericEntry();
+    }
+
+    for( modules::iterator i_module=begin;i_module!=end;++ i_module ){
+        WFSOut(2, "RunManager")<<"AfterLastEntry on: "<<i_module->second->GetName();
+        i_module->second->AfterLastEntry();
+    }
 }
 
 void RunManager::Abort(){

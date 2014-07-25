@@ -2,8 +2,8 @@
 #include "ModulesFactory.h"
 #include "ModulesOptions.h"
 #include "wfsDefinitions.h"
+#include "wfsLog.h"
 
-#include <iostream>
 using std::cout;
 using std::endl;
 

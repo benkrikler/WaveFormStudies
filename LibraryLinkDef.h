@@ -1,4 +1,5 @@
 #pragma link C++ class std::vector<std::string>+;
+#pragma link C++ class WFS::WaveForm+;
 
 //#pragma link C++ class IDs::channel+;
 //#pragma link C++ class IDs::generator+;
