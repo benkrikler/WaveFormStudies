@@ -2,6 +2,7 @@
 #include <iostream>
 #include <TDirectory.h>
 #include <TFile.h>
+#include "BaseModule.h"
 using std::cout;
 using std::endl;
 
@@ -91,4 +92,20 @@ void modules::navigator::AddModule(const std::string& name, BaseModule* mod){
 int modules::navigator::HowMany(const std::string& name)const{
     if(fModulesMade) return fModulesSearch.count(name);
     return fModulesFile.HowMany(name);
+}
+
+const BaseModule* modules::navigator::GetPreviousModule(BaseModule* mod)const{
+    // find the module in the ordered list
+        const std::string name = mod->GetName();
+    for(modules::const_iterator i_mod=Begin();
+            i_mod!=End();++i_mod){
+        // if we match, 
+        if(name==i_mod->first){
+            // return NULL if we're at the start of the modules list
+            if (i_mod==Begin()) break;
+            //return the previous iterator
+            else return (--i_mod)->second;
+        }
+    }
+    return NULL;
 }

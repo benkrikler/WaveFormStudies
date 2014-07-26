@@ -1,5 +1,6 @@
 #include "wfsDefinitions.h"
 #include "ModulesOptions.h"
+#include "wfsWaveform.h"
 
 class TFile;
 
@@ -29,9 +30,14 @@ class WFS::RunManager{
 
         TFile* GetOutFile()const {return fOutFile;}
 
+        static void SetGlobalWaveform(const std::string& name, WFS::WaveForm& waveform){
+            Instance()->fGlobalWaveforms[name]=&waveform;
+        }
 
     private:
         static RunManager* fThis;
         modules::options fCommandLine;
         TFile* fOutFile;
+
+        std::map<std::string, WFS::WaveForm*> fGlobalWaveforms;
 };

@@ -82,9 +82,19 @@ void RunManager::RunEventLoop(){
         i_module->second->BeforeFirstEntry();
     }
 
-    for( modules::iterator i_module=begin;i_module!=end;++ i_module ){
+    bool go_on=true;
+    for( modules::iterator i_module=begin;
+            go_on;){
         WFSOut(2, "RunManager")<<"ProcessEntry on: "<<i_module->second->GetName();
-        i_module->second->ProcessGenericEntry();
+
+        // Run the module
+        go_on=i_module->second->ProcessGenericEntry();
+
+        // move to next module.  
+        ++i_module ;
+
+        // If it's the last module, go back to the first one
+        if(i_module==end) i_module=begin;
     }
 
     for( modules::iterator i_module=begin;i_module!=end;++ i_module ){

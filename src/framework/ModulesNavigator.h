@@ -78,6 +78,8 @@ class modules::navigator{
       /// @brief Tell the navigator which output file to be used
       void SetOutFile(TFile* file){fOutFile=file;}
 
+      const BaseModule* GetPreviousModule(BaseModule* )const;
+
   private:
       void AddModule(const std::string&, BaseModule*);
 
