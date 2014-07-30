@@ -41,17 +41,17 @@ BaseModule::~BaseModule()
 {
 }
 
-int BaseModule::ProcessEntry(){
-  // This is a virtual function and should be overwritten by the deriving analysis module!
-  return 0;
-}
+//int BaseModule::ProcessEntry(bool& go_on){
+//  // This is a virtual function and should be overwritten by the deriving analysis module!
+//  return 0;
+//}
 
-int BaseModule::ProcessGenericEntry(){
+int BaseModule::ProcessGenericEntry(bool& go_on){
   // This is called by our main routine and would allow later to split into different 
   // process routines if we have more than one Tree and hence different tpyes of data input.
 
   if(fDirectory) fDirectory->cd();
-  int ret = ProcessEntry();
+  int ret = ProcessEntry(go_on);
   gDirectory->cd("/");
 
   return ret;

@@ -11,7 +11,7 @@ class RemoveFrequencies : public BaseModule {
   ~RemoveFrequencies();
 
  private:
-  virtual int ProcessEntry();
+  virtual int ProcessEntry(bool & go_on);
   virtual int BeforeFirstEntry();
   virtual int AfterLastEntry();
 };

@@ -2,6 +2,7 @@
 #include "wfsLog.h"
 #include "wfsErrors.h"
 #include "ModulesNavigator.h"
+#include "ModulesParser.h"
 #include "BaseModule.h"
 
 #include <unistd.h>
@@ -10,6 +11,13 @@
 using std::endl;
 
 WFS::RunManager* WFS::RunManager::fThis=NULL;
+
+
+namespace{
+    bool PowerOfTwo(long int x){
+        return ((x != 0) && !(x & (x - 1)));
+    }
+}
 
 using namespace WFS;
 
@@ -23,7 +31,15 @@ struct Usage:public WFS::Errors::BaseError{
         std::string fName,fError;
 };
 
-RunManager::RunManager():fCommandLine("RunManager"),fOutFile(NULL){
+struct EventLoopError:public WFS::Errors::BaseError{
+    ~EventLoopError()throw(){}
+    EventLoopError(int ret_val):WFS::Errors::BaseError(ret_val){}
+        virtual void What(std::stringstream& os){
+            os<<"Problem in main event loop\n";
+        };
+};
+
+RunManager::RunManager():fCommandLine("RunManager"),fOutFile(NULL),fProcessNumEvents(0){
 }
 
 void RunManager::ProcessCommandLine(int argc,char* argv[]){
@@ -31,7 +47,7 @@ void RunManager::ProcessCommandLine(int argc,char* argv[]){
     WFSOut(3)<<"Processing command line with "<<argc-1<<" arguments"<<std::endl;
 
     char c;
-    while( (c=getopt(argc,argv,"h?o:vm:q"))!=-1 ){
+    while( (c=getopt(argc,argv,"h?n:o:vm:q"))!=-1 ){
         switch (c){
             case 'h': case '?':
                 throw Usage(argv[0]);
@@ -50,6 +66,9 @@ void RunManager::ProcessCommandLine(int argc,char* argv[]){
             case 'm': 
                 fCommandLine.SetOption("module_file",optarg);
                 break;
+            case 'n': 
+                fProcessNumEvents=modules::parser::GetNumber(optarg);
+                break;
             default:
                 std::string error="Unknown option ";
                 error+=c;
@@ -67,39 +86,59 @@ void RunManager::OpenOutputs(){
     std::string filename=fCommandLine.GetString("output_file","output.root");
     fOutFile=new TFile(filename.c_str(),"recreate");
     if(fOutFile){
-        WFSOut(2)<<"Opened file, '"<<filename<<"'"<<std::endl;
+        WFSOut(2,"RunManager")<<"Opened file, '"<<filename<<"'"<<std::endl;
         modules::navigator::Instance()->SetOutFile(fOutFile);
     }
 }
 
 void RunManager::RunEventLoop(){
     WFSOut(3)<<"Main Event loop"<<std::endl;
+
+    // Setup the module iterators
     const modules::iterator begin=modules::navigator::Instance()->Begin();
     const modules::iterator end=modules::navigator::Instance()->End();
+    modules::iterator i_module;
 
-    for( modules::iterator i_module=begin;i_module!=end;++ i_module ){
-        WFSOut(2, "RunManager")<<"BeforeFirstEntry on: "<<i_module->second->GetName();
-        i_module->second->BeforeFirstEntry();
+    // Run all BeforeFirstEntry methods
+    int ret_val=0;
+    for( i_module=begin;i_module!=end;++ i_module ){
+        WFSOut(2, "RunManager")<<"BeforeFirstEntry on: "<<i_module->second->GetName()<<endl;
+        ret_val=i_module->second->BeforeFirstEntry();
+        if(ret_val!=0){
+            WFSErr(1)<<"Error running BeforeFirstEntry for module '"<<i_module->first<<"'"<<endl;
+            throw EventLoopError(ret_val);
+        }
     }
 
+    // Run all ProcessEntry methods
     bool go_on=true;
-    for( modules::iterator i_module=begin;
-            go_on;){
-        WFSOut(2, "RunManager")<<"ProcessEntry on: "<<i_module->second->GetName();
+    for(long int i_event=0;
+            i_event<NumberEventsToProcess() && go_on;
+            ++i_event){
+        // If we're a power of 2 print out the current event number
+        if(PowerOfTwo(i_event)) WFSOut(1,"RunManager")<<"Processing event number: "<<i_event<<endl;
 
-        // Run the module
-        go_on=i_module->second->ProcessGenericEntry();
+        // Loop over each module
+        for( i_module=begin;i_module!=end && go_on; ++i_module ){
+            WFSOut(3, "RunManager")<<"ProcessEntry on: "<<i_module->second->GetName()<<endl;
 
-        // move to next module.  
-        ++i_module ;
-
-        // If it's the last module, go back to the first one
-        if(i_module==end) i_module=begin;
+            // Run the module
+            ret_val=i_module->second->ProcessGenericEntry(go_on);
+            if(ret_val!=0){
+                WFSErr(1)<<"Error running ProcessEntry for module '"<<i_module->first<<"'"<<endl;
+                throw EventLoopError(ret_val);
+            }
+        }
     }
 
-    for( modules::iterator i_module=begin;i_module!=end;++ i_module ){
-        WFSOut(2, "RunManager")<<"AfterLastEntry on: "<<i_module->second->GetName();
-        i_module->second->AfterLastEntry();
+    // Run all AfterLastEntry methods
+    for( i_module=begin;i_module!=end; ++i_module ){
+        WFSOut(2, "RunManager")<<"AfterLastEntry on: "<<i_module->second->GetName()<<endl;
+        ret_val=i_module->second->AfterLastEntry();
+        if(ret_val!=0){
+            WFSErr(1)<<"Error running AfterLastEntry for module '"<<i_module->first<<"'"<<endl;
+            throw EventLoopError(ret_val);
+        }
     }
 }
 

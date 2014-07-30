@@ -34,16 +34,19 @@ class WFS::Logger {
         void LessOutput(){ IncremementVerbosity(fOutVerbosity,-1);}
         void LessError() { IncremementVerbosity(fErrVerbosity,-1);}
 
-        std::ostream& Output( Level_t level,const char* header){
-            return Write(header,level,fOutVerbosity,GetOutStream());
+        std::ostream& Output( Level_t level,const std::string& header=""){
+            return Write(std::string(level,'%')+' '+header,level,fOutVerbosity,GetOutStream());
         }
-        std::ostream& Error ( Level_t level,const char* header){
+        std::ostream& Error ( Level_t level,const std::string& header=""){
             return Write(header,level,fErrVerbosity,GetErrStream());
         }
 
     private:
-        std::ostream& Write(const char* header, Level_t level, Level_t current, std::ostream& os){
-            if(level<current) return os<<std::boolalpha<<header;
+        std::ostream& Write(const std::string& header, Level_t level, Level_t current, std::ostream& os){
+            if(level<current) {
+                if(!header.empty()) os<<header<<": ";
+                return os<<std::boolalpha;
+            }
             return *(std::ostream*)fNull;
         }
 
@@ -64,10 +67,10 @@ class WFS::Logger {
 };
 
 #define WFSOut(level, ...) \
-    WFS::Logger::Instance()->Output( (WFS::Logger::Level_t) level, #__VA_ARGS__  )
+    WFS::Logger::Instance()->Output( (WFS::Logger::Level_t) level, ##__VA_ARGS__  )
 
 #define WFSErr3(level,lineno) \
-    WFS::Logger::Instance()->Error( (WFS::Logger::Level_t) level, "Error: "__FILE__ "(" #lineno "): " )
+    WFS::Logger::Instance()->Error( (WFS::Logger::Level_t) level, "Error: "__FILE__ "(" #lineno ")" )
 
 #define WFSErr2(level,lineno) WFSErr3(level,lineno) 
 

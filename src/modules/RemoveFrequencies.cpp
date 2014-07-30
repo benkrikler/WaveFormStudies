@@ -24,7 +24,7 @@ int RemoveFrequencies::BeforeFirstEntry(){
   return 0;
 }
 
-int RemoveFrequencies::ProcessEntry(){
+int RemoveFrequencies::ProcessEntry(bool & go_on){
     // Get the current waveform
     //
     // Set points on the transform's 

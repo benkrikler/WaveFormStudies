@@ -28,7 +28,7 @@ class BaseModule
   /// Method called by the main event loop for each entry in the input root tree.
   /// Does some simple work, then hooks into the derived class through ProcessEntry.
   /// @return 0 on sucess and non-zero if a problem occurred
-  int ProcessGenericEntry();
+  int ProcessGenericEntry(bool &go_on);
 
   /// Optional method which is called once before the main event loop
   /// Can be used to parse options and setup histograms.
@@ -64,7 +64,7 @@ class BaseModule
    /// called for each event.
    ///
    /// @return 0 on success and non-zero on failure
-   virtual int ProcessEntry();
+   virtual int ProcessEntry(bool& go_on)=0;
 
  private:
    bool fDebug;

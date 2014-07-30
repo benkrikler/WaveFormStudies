@@ -16,10 +16,12 @@ class OldInputsToWaveforms : public BaseModule {
   ~OldInputsToWaveforms();
 
  private:
-  virtual int ProcessEntry();
+  virtual int ProcessEntry(bool & go_on);
   virtual int BeforeFirstEntry();
   virtual int AfterLastEntry();
 
+
+  long int fCurrentEvent;
   std::string fInputFileName;
   std::string fTreeName;
 

@@ -22,7 +22,7 @@ int %module%::BeforeFirstEntry(){
 
 // Called once for each event in the main event loop
 // Return non-zero to indicate a problem and terminate the event loop
-int %module%::ProcessEntry(){
+int %module%::ProcessEntry(bool &go_on){
   return 0;
 }
 

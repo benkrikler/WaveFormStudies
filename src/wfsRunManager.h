@@ -30,14 +30,25 @@ class WFS::RunManager{
 
         TFile* GetOutFile()const {return fOutFile;}
 
+        long int NumberEventsToProcess()const{return fProcessNumEvents;}
+        void NumberEventsToProcess(long int n){fProcessNumEvents=n;}
+
         static void SetGlobalWaveform(const std::string& name, WFS::WaveForm& waveform){
             Instance()->fGlobalWaveforms[name]=&waveform;
         }
+
+        static WFS::WaveForm* GetGlobalWaveform(const std::string& name){
+            std::map<std::string, WFS::WaveForm*>::iterator i_wave= Instance()->fGlobalWaveforms.find(name);
+            if(i_wave==Instance()->fGlobalWaveforms.end()) return NULL;
+            return i_wave->second;
+        }
+
 
     private:
         static RunManager* fThis;
         modules::options fCommandLine;
         TFile* fOutFile;
+        long unsigned int fProcessNumEvents;
 
         std::map<std::string, WFS::WaveForm*> fGlobalWaveforms;
 };

@@ -16,6 +16,7 @@ OldInputsToWaveforms::OldInputsToWaveforms(modules::options* opts):
    BaseModule("OldInputsToWaveforms",opts),fInFile(NULL),fInTree(NULL){
        fInputFileName=opts->GetString("input_file");
        fTreeName=opts->GetString("tree_name","t1");
+       fCurrentEvent=opts->GetInt("first_event",0);
 }
 
 OldInputsToWaveforms::~OldInputsToWaveforms(){
@@ -55,29 +56,27 @@ int OldInputsToWaveforms::BeforeFirstEntry(){
     fOutWaveform[0].Size((int)fNoData);
     fOutWaveform[1].Size((int)fNoData);
 
-  return 0;
-}
-
-int OldInputsToWaveforms::ProcessEntry(){
-    // loop over all waveforms in input tree and for each channel fill the
-    // waveforms as such
-    
+    // setup the number of entries
     long int n_entries=fInTree->GetEntries();
     WFSOut(2, "OldInputsToWaveforms")<<"Input file has "
         <<n_entries<<" waveforms to convert "<<endl;
 
-    // Loop over each waveform
-    for(long int i_event =0; i_event < n_entries;++i_event){
-        fInTree->GetEntry(i_event);
-        // Loop over each channel
-        for (int i_channel=0; i_channel<2; ++i_channel){
-            fOutWaveform[i_channel].SetTicks(fInX[i_channel]);
-            fOutWaveform[i_channel].SetSamples(fInY[i_channel]);
-        } //channels
+  return 0;
+}
 
-        // Store the converted waveforms
-        fOutTree->Fill();
-    } //events
+int OldInputsToWaveforms::ProcessEntry(bool & go_on){
+    // loop over all waveforms in input tree and for each channel fill the
+    // waveforms as such
+
+    fInTree->GetEntry(fCurrentEvent);
+    // Loop over each channel
+    for (int i_channel=0; i_channel<2; ++i_channel){
+        fOutWaveform[i_channel].SetTicks(fInX[i_channel]);
+        fOutWaveform[i_channel].SetSamples(fInY[i_channel]);
+    } //channels
+
+    // Store the converted waveforms
+    fOutTree->Fill();
 
   return 0;
 }

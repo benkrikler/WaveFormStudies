@@ -10,5 +10,4 @@ namespace WFS{
     typedef TVectorF ADCSamples_t;
 }
 
-
 #endif // WFS_DEFINITIONS_H

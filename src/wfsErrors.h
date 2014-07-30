@@ -18,6 +18,8 @@ class WFS::Errors::BaseError: public std::exception{
         virtual const char* what();
         int Exit(int parent)const{return parent*100 + fExitCode;}
 
+    protected: 
+        void SetExitCode(int i ){fExitCode=i;}
     private:
         int fExitCode;
 };
