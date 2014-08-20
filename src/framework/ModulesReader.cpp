@@ -124,17 +124,15 @@ int modules::reader::AddModule(std::string line){
         return 2;
     }
     TrimWhiteSpaceBeforeAfter(type);
-
-    // Get arguments to the module if they're provided
-    std::vector<std::string> args;
-    TokeniseByDelimiter(constructor.inside,args,",");
+    const std::string& arguments=constructor.inside;
 
     if(fShouldPrint){
         std::cout<<"Adding module: '"<<type<<"'"<<std::endl;
         std::cout<<"   with alias: '"<<alias<<"'"<<std::endl;
-        std::cout<<"   and "<<args.size()<<" arguments:"<<std::endl;
-        for(unsigned i=0;i<args.size() ;i++)
-            std::cout<<"     "<<i<<'\t'<<args[i]<<std::endl;
+        if(arguments.empty())
+        std::cout<<"   but no arguments"<<std::endl;
+        else
+        std::cout<<"   and  arguments: "<<arguments<<std::endl;
     }
 
     //Add the module to the list of modules
@@ -152,9 +150,7 @@ int modules::reader::AddModule(std::string line){
         opts->SetAlias(alias);
     }
     // Add all arguments passed to this module to it's options
-    for(unsigned i=0;i<args.size();i++) {
-        opts->AddArgument(i,args[i]);
-    }
+    opts->SetArguments(arguments);
 
     // Stick this module into the list of modules
     fModules.push_back(std::make_pair(type,opts));

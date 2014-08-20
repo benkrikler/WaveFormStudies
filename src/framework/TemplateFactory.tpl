@@ -32,7 +32,16 @@ BaseModule* TemplateFactory<BaseModule,OptionsType>::createModule(
     BaseModule* module=NULL;
     typename MakersList::iterator it  = fModuleMakers.find(name);
     if(it != fModuleMakers.end() ){
-        // make the module
+        if(opts){
+            // convert the argument values into options
+            for(typename OptionsType::ArgumentsList_t::const_iterator i_arg=opts->beginArgs();
+                    i_arg!=opts->endArgs(); ++i_arg){
+                    const std::string& arg_name
+                        =GetArgumentName(name,i_arg-opts->beginArgs());
+                    opts->SetOption(arg_name,*i_arg,false);
+            }
+        }
+        // make the module;
         maker make= it->second;
         module=make(opts);
     }else{

@@ -16,6 +16,9 @@ class modules::options{
         typedef std::map<std::string,std::string> OptionsList_t;
         /// Helper typedef, intended to keep the order of option declaration
         typedef std::vector<OptionsList_t::iterator> OptionsOrder_t;
+        /// Helper typedef, intended for the list of Arguments passed into a
+        /// constructor 
+        typedef std::vector<std::string> ArgumentsList_t;
 
     public:
         /// @brief Constructor of an option.  The name of the module that will
@@ -36,7 +39,7 @@ class modules::options{
         /// @details If a previous value was set, it is replaced by this one
         /// @param key The name of the option to set
         /// @param value The new value 
-        void SetOption(const std::string& key, const std::string& value);
+        void SetOption(const std::string& key, const std::string& value, bool overwrite=true);
 
         /// @brief Append a new value to a list
         /// @details The new value is separated from the previous one with: " : "
@@ -45,13 +48,14 @@ class modules::options{
         /// @return true if a value existed already and false if not
         bool AppendToOption(const std::string& key, const std::string& value);
 
-        /// @brief Set the value of an argument.
+        /// @brief Set all arguments to this module with a single string
         /// @details If the module has not specified a name for this argument, the key
-        /// for this option is set to number
-        /// @seealso ALCAP_REGISTER_MODULE
-        /// @param number The number of the argument to set
-        /// @param value The new value of the argument
-        void AddArgument(const int& number, const std::string& value);
+        /// for this option is set to number.
+        /// All arguments should be delimited by a comma (,)
+        ///
+        /// @seealso REGISTER_MODULE
+        /// @param args A string containing all arguments
+        void SetArguments(const std::string& args);
 
         /*-------------  Used to retrieve values -------------*/
 
@@ -119,6 +123,12 @@ class modules::options{
         /// Get a const iterator to the last key-value pair (sorted alphabetically by key)
         OptionsList_t::const_iterator end()const{return fOptions.end();};
 
+        /// Get a const iterator to the first argument
+        ArgumentsList_t::const_iterator beginArgs()const{return fArguments.begin();};
+        /// Get a const iterator to the last argument
+        ArgumentsList_t::const_iterator endArgs()const{return fArguments.end();};
+
+
         //OptionsList_t::iterator begin(){return fOptions.begin();};
         //OptionsList_t::iterator end(){return fOptions.end();};
 
@@ -147,17 +157,26 @@ class modules::options{
     private:
         OptionsList_t fOptions;
         OptionsOrder_t fOrder;
-        int fIdNumber;
 
+        ArgumentsList_t fArguments;
+
+        int fIdNumber;
         std::string fModuleName;
 
 };
 
-inline void modules::options::SetOption(const std::string& name, const std::string& option){
-    // if a new key was added, store an iterator in the order list
+inline void modules::options::SetOption(const std::string& name, const std::string& option, bool overwrite){
+    // Get an iterator for this option to check if this option has been set before
     OptionsList_t::iterator it = fOptions.find(name);
-    fOptions[name]=option;
-    if(it==fOptions.end()) fOrder.push_back(fOptions.find(name));
+    // If this option doesn't currently exist then add it to both lists
+    if(it==fOptions.end()){
+        fOptions[name]=option;
+        fOrder.push_back(fOptions.find(name));
+    }
+    // else if we want to overwrite it then do so
+    else if(overwrite){
+        fOptions[name]=option;
+    }
 }
 
 inline bool modules::options::HasOption(const std::string& name)const{

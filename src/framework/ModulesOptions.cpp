@@ -1,6 +1,5 @@
 #include "ModulesOptions.h"
 #include "ModulesParser.h"
-#include "ModulesFactory.h"
 #include <sstream>
 #include <iostream>
 #include <string.h>
@@ -77,11 +76,8 @@ void modules::options::DumpOptions(const std::string& prefix)const{
     }
 }
 
-void modules::options::AddArgument(const int& number, const std::string& option){
-    // Get the name of this argument
-    std::string name = modules::factory::Instance()->GetArgumentName(fModuleName,number);
-    // Set the value of the corresponding option
-    modules::options::SetOption(name,option);
+void modules::options::SetArguments(const std::string& args){
+    modules::parser::TokeniseByDelimiter(args,fArguments,", ");
 }
 
 bool modules::options::AppendToOption(const std::string& name, const std::string& option){
