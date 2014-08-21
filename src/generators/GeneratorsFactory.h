@@ -29,8 +29,6 @@ inline generators::factory* generators::factory::Instance(){
     return fThis;
 }
 
-generators::factory* generators::factory::fThis=NULL;
-
 #define REGISTER_GENERATOR( CLASS , ... ) \
 RegistryProxy<CLASS##Generator,WaveformGenerator,generators::options,generators::factory> p_##CLASS(#CLASS, #__VA_ARGS__);
 
