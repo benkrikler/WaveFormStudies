@@ -21,22 +21,19 @@ namespace{
 
 using namespace WFS;
 
-struct Usage:public WFS::Errors::BaseError{
+class Usage:public WFS::Errors::BaseError{
+    public:
+    Usage(const std::string& name,const std::string& error=""):WFS::Errors::BaseError(0){
+        if(!error.empty()) SetWhat() <<"Error: "<<error<<"\n\n";
+        SetWhat()<<"Usage: "<<name<<" [options]\n";
+    }
     ~Usage()throw(){}
-    Usage(const std::string& name,const std::string& error=""):WFS::Errors::BaseError(0),fName(name){}
-        virtual void What(std::stringstream& os){
-            if(!fError.empty()) os <<"Error: "<<fError<<"\n\n";
-            os<<"Usage: "<<fName<<" [options]\n";
-        };
-        std::string fName,fError;
 };
 
-struct EventLoopError:public WFS::Errors::BaseError{
+class EventLoopError:public WFS::Errors::BaseError{
+    public:
+    EventLoopError(int ret_val):WFS::Errors::BaseError(ret_val,"Problem in main event loop\n"){}
     ~EventLoopError()throw(){}
-    EventLoopError(int ret_val):WFS::Errors::BaseError(ret_val){}
-        virtual void What(std::stringstream& os){
-            os<<"Problem in main event loop\n";
-        };
 };
 
 RunManager::RunManager():fCommandLine("RunManager"),fOutFile(NULL),fProcessNumEvents(0){
