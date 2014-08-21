@@ -1,6 +1,7 @@
 # A list of directories with source files.
 DIRS += src/\
         src/framework/\
+        src/generators/\
         src/modules
 
 # A list of classes that need dictionary generation by root
