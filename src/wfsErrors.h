@@ -12,22 +12,26 @@ namespace WFS{
 
 class WFS::Errors::BaseError: public std::exception{
     public:
-        BaseError(int e):fExitCode(e){};
+        BaseError(int e , const std::string& w=""):fExitCode(e),fWhat(w){};
+        BaseError(const BaseError& rhs){
+            fExitCode=rhs.fExitCode;
+            fWhat.clear();
+            fWhat.str(rhs.fWhat.str());
+        };
         virtual ~BaseError()throw(){};
-        virtual void What(std::stringstream& )=0;
-        virtual const char* what();
+        virtual const char* what(){return fWhat.str().c_str();}
+        std::stringstream& SetWhat(){return fWhat;}
         int Exit(int parent)const{return parent*100 + fExitCode;}
 
     protected: 
         void SetExitCode(int i ){fExitCode=i;}
     private:
         int fExitCode;
+        std::stringstream fWhat;
 };
 
 class WFS::Errors::CannotOpenFile:public WFS::Errors::BaseError{
-    CannotOpenFile(const std::string& f, int i):BaseError(i),fFile(f){};
+    CannotOpenFile(const std::string& f, int i):
+        BaseError(i,"Failed to open file: '"+f+"'"){};
     ~CannotOpenFile()throw(){}
-    void What(std::stringstream& os){ os<<"Failed to open file: '"<<fFile<<"'";}
-    private:
-        std::string fFile;
 };
