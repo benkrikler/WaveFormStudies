@@ -26,6 +26,8 @@ class WaveformGenerator {
         };
         virtual ~WaveformGenerator(){};
 
+        virtual int Initialise()=0;
+        virtual int Finalize()=0;
     public:
         virtual const WFS::WaveForm& GetWaveform()=0;
         virtual long int GetNumWFS()=0;

@@ -27,6 +27,12 @@ int WaveformSource::BeforeFirstEntry(){
         WFSErr(1)<<"Unknown mode: '"<<fMode<<"'"<<endl;
         return 1;
     }
+    int ret_val= fGenerator->Initialise();
+    if(ret_val){
+        WFSErr(1)<<"Problem initialising generator, '"<<fGenerator<<"'"<<endl;
+        return ret_val;
+    }
+
     WFS::RunManager::Instance()->NumberEventsToProcess(fGenerator->GetNumWFS());
   return 0;
 }
@@ -40,6 +46,11 @@ int WaveformSource::ProcessEntry(bool& go_on){
 }
 
 int WaveformSource::AfterLastEntry(){
+    int ret_val=fGenerator->Finalize();
+    if(ret_val){
+        WFSErr(1)<<"Problem finalising generator, '"<<fGenerator<<"'"<<endl;
+        return ret_val;
+    }
   return 0;
 }
 
